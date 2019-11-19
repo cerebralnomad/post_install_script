@@ -184,6 +184,7 @@ echo ""
 
 if [[ $DISTRO == "y"* || $DISTRO == "Y"* ]] ; then
 	apt install -y latte-dock 2>> /home/$USERNAME/Documents/post_install_error.log && printf "\nLatte Dock installed... \n\n"
+	apt install yakuake -y && printf "\nYAKUAKE installed...\n\n"
 fi
 
 echo "Installing Terminal Addons for Fresh Install"
@@ -204,23 +205,6 @@ for pkg in "${addons[@]}" ; do
 done
 
 npm install -g tldr && printf "\nTLDR installed... \n\n"
-
-while true; do
-
-    echo -n "Is this a KDE install (eg 'Kubuntu')?: "
-    read DISTRO
-    case $DISTRO in
-    	y*|Y*)
-            apt install yakuake -y && printf "\nYAKUAKE installed...\n\n"
-            break;;
-        n*|N*)
-            printf "\nSkipping YAKUAKE install...\n\n"
-            break;;
-        *)
-            printf "\nYes or No please [y/n]\n\n"
-            echo ""
-    esac
-done
 
 chsh -s /usr/bin/zsh
 echo ""
