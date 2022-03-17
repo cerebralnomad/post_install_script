@@ -68,7 +68,6 @@ snaps=(
 	gimp
 	gnome-sudoku
 	sublime-text
-	youtube-dl
 	cheat
 	solitaire
     newpass
@@ -196,6 +195,13 @@ if [[ $DISTRO == "y"* || $DISTRO == "Y"* ]] ; then
 	apt install -y latte-dock 2>> /home/$USERNAME/Documents/post_install_error.log && printf "\nLatte Dock installed... \n\n"
 	apt install yakuake -y && printf "\nYAKUAKE installed...\n\n"
 fi
+
+# Install yt-dlp, a better youtube-dl replacement
+
+curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+chmod a+rx /usr/local/bin/yt-dlp
+echo "yt-dlp installed"
+echo ""
 
 echo "Installing Terminal Addons for Fresh Install"
 echo "============================================"
