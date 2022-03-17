@@ -37,6 +37,8 @@ packages=(
 	git
 	apt-transport-https # Needed for Syncthing
 	zsh
+	libdvd-pkg
+	dvdbackup
 	)
 
 # GUI applications 
@@ -55,7 +57,10 @@ apps=(
 	gnupg2 # PGP handling
 	gnubg  # Backgammon game
 	gtkhash # GUI checksum application
-	)
+    libpwquality-tools  # for the pwscore utility to check pw strength
+	exiftool  # tool for displaying metadata of epub and other formats
+	bucklespring # utility to make kestrokes mimic IBM keyboard
+    )
 
 # Snap packages
 
@@ -64,6 +69,10 @@ snaps=(
 	gnome-sudoku
 	sublime-text
 	youtube-dl
+	cheat
+	solitaire
+    newpass
+    bashtop
 	)
 
 #Terminal addons
@@ -130,6 +139,13 @@ for pkg in "${packages[@]}" ; do
 		printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
 	fi
 done
+echo ""
+
+# Configure the libdvd package for automatic updates
+
+echo "Time to configure the libdvd package"
+echo "===================================="
+dpkg-reconfigure libdvd-pkg
 
 echo ""
 echo "Adding Additional Sources with wget and curl"
@@ -143,21 +159,15 @@ wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sh /dev/std
 
 # MKVToolnix repo
 # There are new repos for every version of Ubuntu
-# The code below will have to be updated periodically to include
-# new versions and remove versions no longer supported refer to
+# The code below will have to be updated periodically for new Ubuntu
+# versions and remove versions no longer supported refer to
 # https://mkvtoolnix.download/downloads.html#ubuntu
+# This should always be set for the current LTS
 
-echo "Enter the number in () next to the version of Ubuntu you are using"
-echo "    (1) 18.04"
-echo "    (2) 19.10"
-echo -n ">>> "
-read VER
-wget -q -O - https://mkvtoolnix.download/gpg-pub-moritzbunkus.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
-case $VER in
-    1) echo 'deb https://mkvtoolnix.download/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/mkvtoolnix.download.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nMKVToolNix repo installed for 18.10\n\n' ;;
-    2) echo 'deb https://mkvtoolnix.download/ubuntu/ eoan main' | tee /etc/apt/sources.list.d/mkvtoolnix.download.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nMKVToolNix repo installed for 19.10\n\n' ;;
-esac
+wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg 2>> /home/$USERNAME/Documents/post_install_error.log
+echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ focal main' | tee /etc/apt/sources.list.d/mkvtoolnix.download.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nMKVToolNix repo installed for 20.04\n\n' 
 echo ''
+
 # Syncthing repo
 curl -s https://syncthing.net/release-key.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
 echo 'deb https://apt.syncthing.net/ syncthing stable' | tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nSyncthing repo installed\n\n'
