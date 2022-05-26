@@ -60,6 +60,7 @@ apps=(
     libpwquality-tools  # for the pwscore utility to check pw strength
 	exiftool  # tool for displaying metadata of epub and other formats
 	bucklespring # utility to make kestrokes mimic IBM keyboard
+    nomacs # Image viewer - requires 'Universe' repo to be enabled
     )
 
 # Snap packages
