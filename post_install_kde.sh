@@ -61,6 +61,7 @@ apps=(
     nomacs # Image viewer - requires 'Universe' repo to be enabled
     latte-dock # app dock for KDE
     mediainfo-gui # graphical frontend for mediainfo
+    appimagelauncher # integrate AppImages into the system menu
     )
 
 # Snap packages
@@ -77,6 +78,7 @@ flatpaks=(
         fr.handbrake.ghb
         com.cerebralnomad.recipescribe
         org.gnome.Sudoku
+        org.qbittorrent.qBittorrent
         com.sigil_ebook.Sigil
 )
 
@@ -117,8 +119,8 @@ echo "Adding Required Repositories"
 echo "============================"
 echo ""
 
-# Add the qbittorrent repo
-add-apt-repository -y ppa:qbittorrent-team/qbittorrent-stable 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nqbittorrent repo added...\n\n'
+# Add the AppImage Launcher repo
+add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nAppImage Launcher repo added...\n\n'
 sleep 2
 
 # Add the backports ppa 
