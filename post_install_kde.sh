@@ -24,6 +24,9 @@ echo 'Error log created at:'
 echo "/home/$USERNAME/Documents/post_install_error.log"
 sleep 3
 
+# Create the variables for the various packages to be installed
+# Comment out any you do not want/need
+
 # Command line based tools and non-interactive libraries
 
 packages=(
@@ -44,10 +47,10 @@ apps=(
 	zim # Personal Wiki 
 	keepass2 # Local password vault
 	timeshift # system state automatic backup
-	qbittorrent # Torrent downloader
+	qbittorrent # Torrent downloader - will install from 3rd party PPA
 	bleachbit # System cleaner
-	mkvtoolnix-gui # Video Muxer
-	syncthing # File Syncronization between systems
+	mkvtoolnix-gui # Video Muxer - will install from 3rd party PPA
+	syncthing # File Syncronization between systems - will install from 3rd party PPA
 	gpa # Graphical frontend for gnupg
 	gnupg2 # PGP handling
 	gnubg  # Backgammon game
@@ -117,9 +120,11 @@ echo ""
 # Add the qbittorrent repo
 add-apt-repository -y ppa:qbittorrent-team/qbittorrent-stable 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nqbittorrent repo added...\n\n'
 sleep 2
+
 # Add the backports ppa 
 add-apt-repository ppa:kubuntu-ppa/backports
 sleep 2
+
 # MKVToolnix repo
 # There are new repos for every version of Ubuntu
 # The code below will have to be updated periodically for new Ubuntu
@@ -132,10 +137,12 @@ sudo wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.dow
 echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ noble main' | tee /etc/apt/sources.list.d/mkvtoolnix.download.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nMKVToolNix repo installed for 24.04\n\n'
 echo ''
 sleep 2
+
 # Syncthing repo
 curl -s https://syncthing.net/release-key.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
 echo 'deb https://apt.syncthing.net/ syncthing stable' | tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nSyncthing repo installed\n\n'
 sleep 2
+
 echo "Finished addding repos..."
 echo ""
 echo "Updating Repos and Upgrading System Files"
