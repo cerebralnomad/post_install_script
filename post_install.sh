@@ -25,6 +25,11 @@ echo 'Error log created at:'
 echo "/home/$USERNAME/Documents/post_install_error.log"
 sleep 3
 
+# Increase the bash history size to allow scrolling back through the output
+export HISTSIZE=-1
+export HISTFILESIZE=-1
+source /home/$USERNAME/.bashrc
+
 # Create the variables for the various packages to be installed
 # Comment out any you do not want/need
 
@@ -51,7 +56,6 @@ apps=(
         brave-browser
         dconf-editor # configure application settings on GTK distros
         exiftool  # tool for displaying metadata of epub and other formats
-        firefox
         gimp
         gnupg2 # PGP handling
         gnubg  # Backgammon game
@@ -125,6 +129,26 @@ addons=(
         vim # terminal text editor
 	)
 
+echo "Updating Repos and Upgrading System Files"
+echo "========================================="
+add-apt-repository universe
+add-apt-repository multiverse
+add-apt-repository restricted
+apt update && apt dist-upgrade -y
+sleep 2
+
+# Install the packages first as wget and curl are needed in the next steps
+
+for pkg in "${packages[@]}" ; do
+    if apt install -y $pkg ; then
+        printf "\n$pkg installed... \n\n"
+        sleep 1
+    else
+        printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
+        sleep 1
+    fi
+done
+
 echo "Additional Program Installation for a Fresh OS Install"
 echo "======================================================"
 echo ""
@@ -133,6 +157,7 @@ echo "============================"
 echo ""
 
 # Add the AppImage Launcher repo
+apt install software-properties-common
 add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nAppImage Launcher repo added...\n\n'
 sleep 2
 
@@ -157,40 +182,26 @@ Pin-Priority: 1000
 
 # Add the Brave browser repo for the once or twice a year when a site doesn't work with Firefox
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
 echo "Finished addding repos..."
 echo ""
-echo "Updating Repos and Upgrading System Files"
-echo "========================================="
-apt update && apt dist-upgrade -y
+echo "Updating Newly Added Repos"
+echo "=========================="
+apt update
 
 sleep 2
-
+echo ""
 echo "Installing Additional Tools"
 echo "==========================="
 echo ""
-
-# Install the packages first as wget and curl are needed in the next steps
-
-for pkg in "${packages[@]}" ; do
-	if apt install -y $pkg ; then 
-		printf "\n$pkg installed... \n\n"
-        sleep 1 
-	else 
-		printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
-        sleep 1
-	fi
-done
-echo ""
-sleep 2
 
 # Install Flatpak because Canonical is being a dick about it
 
 echo "Installing Flatpak"
 echo "=================="
 echo ""
-sudo apt install flatpak
+sudo apt install flatpak -y
 sleep 1
 echo ""
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -213,6 +224,10 @@ sleep 2
 echo "Installing Applications"
 echo "======================="
 echo ""
+# Install of firefox will occasionally fail if -y is used without --allow-downgrades
+# so it is installed separately
+apt install -y --allow-downgrades firefox
+
 for app in "${apps[@]}" ; do
 	if apt install -y $app ; then 
 		printf "\n$app installed... \n\n"
@@ -229,7 +244,7 @@ echo "Installing Flatpaks"
 echo "==================="
 echo ""
 for app in "${flatpaks[@]}" ; do
-        if flatpak install flathub $app ; then
+        if flatpak install -y flathub $app ; then
                 printf "\n$app installed... \n\n"
                 sleep 1
         else
@@ -269,7 +284,7 @@ done
 
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
-ln -s /usr/bin/batcat ~/.local/bin/bat
+ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
 
 # Install the TL/DR utility
 npm install -g tldr && printf "\nTLDR installed... \n\n"
