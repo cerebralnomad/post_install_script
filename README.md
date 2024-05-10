@@ -11,7 +11,9 @@ post_install.sh is for the other flavors, it will only be tested with MATE thoug
 Latte Dock and Timeshift repos are no longer used. Those projects have been taken over by KDE and Linux Mint respectively and are in the standard repo.
 
 Some apps have become available as Flatpaks and have been switched to that format to ensure the latest versions.
-This also eliminated the need for the Handbrake repo.
+This also eliminated the need for several additional repos.
+
+Both scripts are now able to be run unattended. There are no requests for input once they are executed.  
 
 The new scripts are currently untested. This line will be removed once testing in complete.
 
