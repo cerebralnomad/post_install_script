@@ -261,7 +261,7 @@ if apt install -y --allow-downgrades firefox ; then
         echo ""
         sleep 1
 else
-s-off missing 24.04        echo""
+        echo""
         echo -e "${red}Firefox install FAILED!${reset}"
         echo "Firefox to install from the Mozilla repo" >> /home/$USERNAME/Documents/post_install_error.log
         echo ""
