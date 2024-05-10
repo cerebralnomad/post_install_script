@@ -100,7 +100,11 @@ flatpaks=(
 )
 
 #Terminal addons
-	
+
+# The offensive fortunes (fortunes-off) package is missing from the 24.04 repo
+# The whining pansies may have gotten it removed
+# Will uncomment if someone of substance decides to put it back
+
 addons=(
 	    bat  # a cat clone with syntax highlighting
         btop  # Resource monitor, like htop but better
@@ -114,7 +118,7 @@ addons=(
         ffmpeg  # command line video converter
         figlet # create ASCII art from plain text
         fortune-mod # display fortunes in the terminal
-        fortunes-off # adds offensive fortunes (fortune -o)
+ #       fortunes-off # adds offensive fortunes (fortune -o)
         gcp  # advanced command-line file copier
         hollywood # silly program to make the terminal look like 1337 H4X0R
         hwinfo # display details abou tsystem hardware
@@ -204,6 +208,9 @@ sleep 2
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
+# Add the fastfetch repo; it is not yet in the 24.04 main repo
+add-apt-repository ppa:zhangsongcui3371/fastfetch -y
+
 echo -e "${green}Finished addding repos...${reset}"
 echo ""
 echo -e "${lightgreen}Updating Newly Added Repos${reset}"
@@ -254,7 +261,7 @@ if apt install -y --allow-downgrades firefox ; then
         echo ""
         sleep 1
 else
-        echo""
+s-off missing 24.04        echo""
         echo -e "${red}Firefox install FAILED!${reset}"
         echo "Firefox to install from the Mozilla repo" >> /home/$USERNAME/Documents/post_install_error.log
         echo ""
@@ -350,8 +357,11 @@ fi
 
 sleep 1
 
+# Change the oh-my-zsh theme
+sudo -H -u $USERNAME sed 's/ZSH_THEME="robbyrussell"/ZSH_THEME="clay"/' /home/$USERNAME/.zshrc
+
 # Change the default shell from bash to zsh
-chsh -s /usr/bin/zsh
+sudo -H -u $USERNAME chsh -s /usr/bin/zsh
 
 echo ""
 echo -e "${green}Terminal Addons and all applications installed... 
