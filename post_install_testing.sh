@@ -54,10 +54,11 @@ packages=(
 	)
 
 # GUI applications 
-
+# Currently (May 2024) the AppImage Launcher PPA does not have a release for Ubuntu 24.04
+# This will be uncommented once it is available
 apps=(
         alacarte # application menu editor
-        appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
+ #       appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
         bleachbit # System cleaner
         brave-browser
         dconf-editor # configure application settings on GTK distros
@@ -137,21 +138,27 @@ addons=(
 
 echo -e "${lightgreen}Updating Repos and Upgrading System Files${reset}"
 echo -e "${lightgreen}=========================================${reset}"
-add-apt-repository universe
-add-apt-repository multiverse
-add-apt-repository restricted
+add-apt-repository universe -y
+add-apt-repository restricted -y
 apt update && apt dist-upgrade -y
+apt install -y software-properties-common
 sleep 2
 
 # Install the packages first as wget and curl are needed in the next steps
 
 for pkg in "${packages[@]}" ; do
     if apt install -y $pkg ; then
-        printf "\n$pkg installed... \n\n"
-        sleep 1
+            echo ""
+            echo -e "${green}$pkg successfully installed...${reset}"
+            echo ""
+            sleep 1
+        
     else
-        printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
-        sleep 1
+            echo ""
+            echo -e "${red}$pkg install FAILED!${reset}"
+            echo "$pkg failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+            echo ""
+            sleep 1
     fi
 done
 
@@ -161,20 +168,6 @@ echo ""
 echo -e "${lightgreen}Adding Required Repositories${reset}"
 echo -e "${lightgreen}============================${reset}"
 echo ""
-
-# Add the AppImage Launcher repo
-apt install software-properties-common
-add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log 
-echo ""
-echo -e "${green}AppImage Launcher repo added...${reset}"
-sleep 2
-
-# Syncthing repo
-curl -s https://syncthing.net/release-key.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
-echo 'deb https://apt.syncthing.net/ syncthing stable' | tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log 
-echo ""
-echo -e "${green}Syncthing repo installed${reset}"
-sleep 2
 
 # Remove the Firefox snap and setup the Mozilla PPA to install the .deb version (thank you Mozilla) because the snap sucks 
 snap remove firefox
@@ -189,6 +182,23 @@ Package: *
 Pin: origin packages.mozilla.org
 Pin-Priority: 1000
 ' | sudo tee /etc/apt/preferences.d/mozilla
+
+# Add the AppImage Launcher repo
+
+# Currently (May 2024) this repo does not have a release for Ubuntu 24.04
+# Uncomment once a release is available
+
+#add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log 
+#echo ""
+#echo -e "${green}AppImage Launcher repo added...${reset}"
+#sleep 2
+
+# Syncthing repo
+curl -L -o /etc/apt/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg  2>> /home/$USERNAME/Documents/post_install_error.log
+echo "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log 
+echo ""
+echo -e "${green}Syncthing repo installed${reset}"
+sleep 2
 
 # Add the Brave browser repo for the once or twice a year when a site doesn't work with Firefox
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
@@ -245,7 +255,8 @@ if apt install -y --allow-downgrades firefox ; then
         sleep 1
 else
         echo""
-        echo -e "${red}Firefox install FAILED!${reset}" 2>> /home/$USERNAME/Documents/post_install_error.log
+        echo -e "${red}Firefox install FAILED!${reset}"
+        echo "Firefox to install from the Mozilla repo" >> /home/$USERNAME/Documents/post_install_error.log
         echo ""
         sleep 1
 fi
@@ -259,7 +270,8 @@ for app in "${apps[@]}" ; do
         sleep 1
 	else 
 		echo ""
-        echo -e "${red}$app install FAILED!${reset}" 2>> /home/$USERNAME/Documents/post_install_error.log
+        echo -e "${red}$app install FAILED!${reset}"
+        echo "$app failed to install" >> /home/$USERNAME/Documents/post_install_error.log
         echo ""
         sleep 1
 	fi
@@ -273,11 +285,13 @@ echo ""
 for app in "${flatpaks[@]}" ; do
         if flatpak install -y flathub $app ; then
                 echo ""
-                echo -e "${green}$app installed...${reset}"
+                echo -e "${green}$app Flatpak installed...${reset}"
                 echo ""
                 sleep 1
         else
-                echo -e "${red}$app install FAILED!${reset}" 2>> /home/$USERNAME/Documents/post_install_error.log
+                echo ""
+                echo -e "${red}$app install FAILED!${reset}"
+                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
                 sleep 1
         fi
 done
@@ -311,7 +325,8 @@ for pkg in "${addons[@]}" ; do
                 sleep 1
         else
                 echo ""
-                echo -e "${red}$pkg install FAILED!${reset}" 2>> /home/$USERNAME/Documents/post_install_error.log
+                echo -e "${red}$pkg install FAILED!${reset}"
+                echo "$pkg failed to install" >> /home/$USERNAME/Documents/post_install_error.log
                 echo ""
                 sleep 1
         fi
@@ -328,7 +343,8 @@ if npm install -g tldr ; then
         echo ""
 else
         echo ""
-        echo -e "${red}TL/DR install FAILED!${reset}" 2>> /home/$USERNAME/Documents/post_install_error.log
+        echo -e "${red}TL/DR install FAILED!${reset}"
+        echo "TLDR failed to install with npm" >> /home/$USERNAME/Documents/post_install_error.log
         echo ""
 fi
 
