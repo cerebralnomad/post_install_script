@@ -20,6 +20,8 @@ red='\033[31m'
 green='\033[32m'
 lightgreen='\033[32m'
 reset='\033[0m'
+pink='\033[31m'
+warn=$(tput setaf 214)
 
 # Create the log file for any errors
 
@@ -372,9 +374,21 @@ fi
 
 sleep 1
 
+# Install broot
+curl -o broot -L https://dystroy.org/broot/download/x86_64-linux/broot
+mv broot /usr/local/bin
+chmod +x /usr/local/bin/broot
+
+echo -e "${pink}Now we'll change the default shell to ZSH. The password for $USERNAME will be required${reset}"
+echo ""
 # Change the default shell from bash to zsh
 sudo -H -u $USERNAME chsh -s /usr/bin/zsh
-
+echo ""
+# Configure broot
+echo -e "${pink}Now we'll configure broot. You will be prompted to let it install the shell function, select Yes${reset}"
+broot
+echo ""
+echo -e "${pink}Now you can use br to run broot${reset}"
 echo ""
 echo -e "${green}Terminal Addons and all applications installed... 
 Remember to configure Git without using sudo privileges after this script has exited.
@@ -387,4 +401,10 @@ Replace the ~/.zshrc with your custom backup.
 Add your aliases file to the bin directory and symlink in the home directory.
 
 Setup script finished.${reset}"
-
+echo ""
+echo -e "${pink}System must reboot for all changes to take effect${reset}"
+echo ""
+echo -e "${warn}System will reboot in 10 seconds...${reset}"
+echo ""
+sleep 10
+reboot
