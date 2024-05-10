@@ -44,24 +44,25 @@ packages=(
 # GUI applications 
 
 apps=(
-	zim # Personal Wiki 
-	keepass2 # Local password vault
-	timeshift # system state automatic backup
-	qbittorrent # Torrent downloader - will install from 3rd party PPA
-	bleachbit # System cleaner
-	mkvtoolnix-gui # Video Muxer - will install from 3rd party PPA
-	syncthing # File Syncronization between systems - will install from 3rd party PPA
-	gpa # Graphical frontend for gnupg
-	gnupg2 # PGP handling
-	gnubg  # Backgammon game
-	gtkhash # GUI checksum application
-    libpwquality-tools  # for the pwscore utility to check pw strength
-	exiftool  # tool for displaying metadata of epub and other formats
-	bucklespring # utility to make kestrokes mimic IBM keyboard
-    nomacs # Image viewer - requires 'Universe' repo to be enabled
-    latte-dock # app dock for KDE
-    mediainfo-gui # graphical frontend for mediainfo
-    appimagelauncher # integrate AppImages into the system menu
+        appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
+        bleachbit # System cleaner
+        brave-browser
+        exiftool  # tool for displaying metadata of epub and other formats
+        firefox
+        gimp
+        gnupg2 # PGP handling
+        gnubg  # Backgammon game
+        gpa # Graphical frontend for gnupg
+        gparted # I just prefer it over KDE Partition Manager
+        gtkhash # GUI checksum application
+        keepass2 # Local password vault
+        latte-dock # app dock for KDE
+        mediainfo-gui # graphical frontend for mediainfo
+        mp3splt-gtk # graphical frontend for mp3splt
+        nomacs # Image viewer - requires 'Universe' repo to be enabled
+        syncthing # File Syncronization between systems - will install from 3rd party PPA
+        timeshift # system state automatic backup
+        zim # Personal Wiki
     )
 
 # Snap packages
@@ -79,37 +80,51 @@ flatpaks=(
         com.cerebralnomad.recipescribe
         org.gnome.Sudoku
         org.qbittorrent.qBittorrent
+        org.bunkus.mkvtoolnix-gui
+        com.calibre_ebook.calibre
         com.sigil_ebook.Sigil
+        org.kde.filelight
+        org.kde.kdenlive
+        org.torproject.torbrowser-launcher
 )
 
 #Terminal addons
 	
 addons=(
-	tree # list contents of directories in a tree-like format
-	gcp  # advanced command-line file copier
-	bat  # a cat clone with syntax highlighting
-	ncdu # NCurses Disk Usage utility
-	inxi # Command line system information script
-	fastfetch # neofetch alternative
-    btop  # Resource monitor
-    ffmpeg  # command line video converter
-	vim  # terminal text editor
-	mediainfo # display information about audio/video files
-	nodejs  # JavaScript runtime
-	npm  # JavaScript package manager
-	fortune # display fortunes in the terminal
-    fortunes-off # adds offensive fortunes (fortune -o)
-    fortune-ng 
-    fortune-mod
-    fortune-docs
-    fortune-libs
-	cowsay 
-	hwinfo # display details about system hardware
-	terminator # terminal emulator
-	dstat  # tool for generating system resource statistics 
-	hollywood # silly program to make teh terminal look like 1337 H4X0R
-	figlet # create ASCII art from plain text
-    yakuake # drop down terminal
+	    bat  # a cat clone with syntax highlighting
+        btop  # Resource monitor, like htop but better
+        bucklespring # utility to make kestrokes mimic IBM keyboard
+        checkinstall # make install replacement for building from source
+        cowsay
+        dmidecode # reports information about your system's hardware as described in your system BIOS
+        dstat  # tool for generating system resource statistics
+        duf # a better du command to display disk usage/free
+        fastfetch # alternative to neofetch which is no longer maintained
+        ffmpeg  # command line video converter
+        figlet # create ASCII art from plain text
+        fortune-mod # display fortunes in the terminal
+        fortunes-off # adds offensive fortunes (fortune -o)
+        gcp  # advanced command-line file copier
+        hollywood # silly program to make the terminal look like 1337 H4X0R
+        hwinfo # display details abou tsystem hardware
+        inxi # command line system information script
+        imagemagick
+        kwave # sound editor for KDE
+        libpwquality-tools  # for the pwscore utility to check pw strength
+        mediainfo # display information about audio/video files
+        mp3gain # mp3 volume adjuster
+        mp3wrap # joins mp3 files
+        mp3splt # split mp3 files without decoding
+        ncdu # NCurses Disk Usage utility
+        nmap # network scanning tool
+        nodejs # JavaScript runtime
+        npm # JavaScript package manager
+        rename # batch rename files using sed syntax
+        simplescreenrecorder
+        terminator # terminal emulator
+        tree # list contents of directories in a tree-like format
+        vim # terminal text editor
+        yakuake # drop down terminal
 	)
 
 echo "Additional Program Installation for a Fresh OS Install"
@@ -127,23 +142,28 @@ sleep 2
 add-apt-repository ppa:kubuntu-ppa/backports
 sleep 2
 
-# MKVToolnix repo
-# There are new repos for every version of Ubuntu
-# The code below will have to be updated periodically for new Ubuntu
-# versions and remove versions no longer supported refer to
-# https://mkvtoolnix.download/downloads.html#ubuntu
-# This should always be set for the current LTS
-# Curently set to 24.04
-
-sudo wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg 2>> /home/$USERNAME/Documents/post_install_error.log
-echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ noble main' | tee /etc/apt/sources.list.d/mkvtoolnix.download.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nMKVToolNix repo installed for 24.04\n\n'
-echo ''
-sleep 2
-
 # Syncthing repo
 curl -s https://syncthing.net/release-key.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
 echo 'deb https://apt.syncthing.net/ syncthing stable' | tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nSyncthing repo installed\n\n'
 sleep 2
+
+# Remove the Firefox snap and setup the Mozilla PPA to install the .deb version (thank you Mozilla) because the snap sucks 
+snap remove firefox
+install -d -m 0755 /etc/apt/keyrings  # Create an APT keyring (if one doesn’t already exist)
+# Import the Mozilla APT repo signing key
+wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+# Add the Mozilla signing key to your sources.list
+echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+# Set the Firefox package priority to ensure Mozilla’s Deb version is always preferred
+echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+' | sudo tee /etc/apt/preferences.d/mozilla
+
+# Add the Brave browser repo for the once or twice a year when a site doesn't work with Firefox
+curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
 echo "Finished addding repos..."
 echo ""
@@ -170,16 +190,19 @@ for pkg in "${packages[@]}" ; do
 done
 echo ""
 sleep 2
+
 # Install Flatpak because Canonical is being a dick about it
 
 echo "Installing Flatpak"
 echo "=================="
 echo ""
 sudo apt install flatpak
+sleep 1
 echo ""
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 echo ""
 sleep 2
+
 echo "Adding Additional Sources with wget and curl"
 echo "============================================"
 echo ""
@@ -189,8 +212,6 @@ sleep 1
 # Pull zsh theme from github and install 
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/clay.zsh-theme -O ~/.oh-my-zsh/themes/clay.zsh-theme
 sleep 1
-# Install Calibre
-wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sh /dev/stdin 2>> /home/$USERNAME/Documents/post_install_error.log
 
 echo "Additional sources added"
 echo ""
@@ -209,6 +230,7 @@ for app in "${apps[@]}" ; do
 done
 echo ""
 sleep 1
+
 echo "Installing Flatpaks"
 echo "==================="
 echo ""
@@ -226,9 +248,17 @@ done
 
 curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
 chmod a+rx /usr/local/bin/yt-dlp
+
+# Add the configuration file to default to best video and audio in mp4 format
+# Other things such as default save location can be added to this file later as desired
+# Comment the next 2 lines to skip the creation of the config file
+echo "# Always choose the best available quality" > /etc/yt-dlp.conf
+echo '-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"' >> /etc/yt-dlp.conf
+
 echo "yt-dlp installed"
 echo ""
 sleep 1
+
 echo "Installing Terminal Addons for Fresh Install"
 echo "============================================"
 echo ""
@@ -243,12 +273,14 @@ for pkg in "${addons[@]}" ; do
         fi
 done
 
-# Create symlink for bat in .local directory; bat is already a system alias
+# Create symlink for bat in .local directory
+# bat installs as batcat on Ubuntu due to a name clash with another existing package
 ln -s /usr/bin/batcat ~/.local/bin/bat
 
 # Install the TL/DR utility
 npm install -g tldr && printf "\nTLDR installed... \n\n"
 sleep 1
+
 # Change the default shell from bash to zsh
 chsh -s /usr/bin/zsh
 
