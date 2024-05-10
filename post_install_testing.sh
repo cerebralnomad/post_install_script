@@ -16,11 +16,14 @@ fi
 clear
 
 # Set variables for colorizing the terminal output
-red='\033[31m'
-green='\033[32m'
-lightgreen='\033[32m'
+red='\033[0;31m'
+green='\033[0;32m'
+lightgreen='\033[1;32m'
 reset='\033[0m'
-pink='\033[31m'
+pink='\033[1;31m'
+lightred='\033[1;31m'
+yellow='\033[1;33m'
+lightpurple='\033[1;35m'
 warn=$(tput setaf 214)
 
 # Create the log file for any errors
@@ -218,7 +221,7 @@ echo ""
 echo -e "${lightgreen}Updating Newly Added Repos${reset}"
 echo -e "${lightgreen}==========================${reset}"
 apt update
-
+bash add to path
 sleep 2
 echo ""
 echo -e "${lightgreen}Installing Additional Tools${reset}"
@@ -342,14 +345,14 @@ for pkg in "${addons[@]}" ; do
 done
 
 # Install the syntax highlighting plugin for ZSH
-sudo -H -u $USERNAME mkdir /home/$USERNAME/.zsh_scripts
+sudo -u $USERNAME mkdir /home/$USERNAME/.zsh_scripts
 cd /home/$USERNAME/.zsh_scripts
-sudo -H -u $USERNAME git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+sudo -u $USERNAME git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
 cd /home/$USERNAME
 
 # Make local directories to be added to PATH
-sudo -H -u $USERNAME mkdir /home/$USERNAME/.local/bin
-sudo -H -u $USERNAME mkdir /home/$USERNAME/bin
+sudo -u $USERNAME mkdir /home/$USERNAME/.local/bin
+sudo -u $USERNAME mkdir /home/$USERNAME/bin
 # Remove existing .zshrc
 rm /home/$USERNAME/.zshrc
 # Fetch modified .zshrc from GitHub
@@ -358,7 +361,7 @@ source /home/$USERNAME/.zshrc
 
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
-sudo -H -u $USERNAME ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
+sudo -u $USERNAME ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
 
 # Install the TL/DR utility
 if npm install -g tldr ; then
@@ -382,11 +385,12 @@ chmod +x /usr/local/bin/broot
 echo -e "${pink}Now we'll change the default shell to ZSH. The password for $USERNAME will be required${reset}"
 echo ""
 # Change the default shell from bash to zsh
-sudo -H -u $USERNAME chsh -s /usr/bin/zsh
+sudo -u $USERNAME chsh -s /usr/bin/zsh
 echo ""
 # Configure broot
 echo -e "${pink}Now we'll configure broot. You will be prompted to let it install the shell function, select Yes${reset}"
-broot
+echo ""
+sudo -u $USERNAME broot
 echo ""
 echo -e "${pink}Now you can use br to run broot${reset}"
 echo ""
