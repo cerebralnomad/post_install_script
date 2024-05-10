@@ -339,12 +339,23 @@ for pkg in "${addons[@]}" ; do
         fi
 done
 
+# Install the syntax highlighting plugin for ZSH
+sudo -H -u $USERNAME mkdir /home/$USERNAME/.zsh_scripts
+cd /home/$USERNAME/.zsh_scripts
+sudo -H -u $USERNAME git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+cd /home/$USERNAME
+
+# Make local directories to be added to PATH
+sudo -H -u $USERNAME mkdir /home/$USERNAME/.local/bin
+sudo -H -u $USERNAME mkdir /home/$USERNAME/bin
+# Remove existing .zshrc
+rm /home/$USERNAME/.zshrc
+# Fetch modified .zshrc from GitHub
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.zshrc -O /home/$USERNAME/.zshrc
+source /home/$USERNAME/.zshrc
+
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
-sudo -H -u $USERNAME mkdir /home/$USERNAME/.local/bin
-echo 'export PATH="/home/$USERNAME/.local/bin:$PATH"' >> /home/$USERNAME/.zshrc
-echo 'export PATH="/home/$USERNAME/bin:$PATH"' >> /home/$USERNAME/.zshrc
-source /home/$USERNAME/.zshrc
 sudo -H -u $USERNAME ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
 
 # Install the TL/DR utility
@@ -360,9 +371,6 @@ else
 fi
 
 sleep 1
-
-# Change the oh-my-zsh theme
-sudo -H -u $USERNAME sed 's/ZSH_THEME="robbyrussell"/ZSH_THEME="clay"/' /home/$USERNAME/.zshrc
 
 # Change the default shell from bash to zsh
 sudo -H -u $USERNAME chsh -s /usr/bin/zsh
