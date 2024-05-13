@@ -43,6 +43,7 @@ source /home/$USERNAME/.bashrc
 
 # Create the variables for the various packages to be installed
 # Comment out any you do not want/need
+# Some of these will already be installed on some distros
 
 # Command line based tools and non-interactive libraries
 
@@ -62,7 +63,7 @@ packages=(
 # Currently (May 2024) the AppImage Launcher PPA does not have a release for Ubuntu 24.04
 # This will be uncommented once it is available
 apps=(
-        alacarte # application menu editor
+        alacarte # application menu editor for GTK only
  #       appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
         bleachbit # System cleaner
         brave-browser
@@ -403,6 +404,9 @@ git config --global user.email me@example.com
 Log out and back in or reboot to activate the ZSH shell.
 Replace the ~/.zshrc with your custom backup.
 Add your aliases file to the bin directory and symlink in the home directory.
+
+If Firefox was not added to the program menu, run alacarte from the command line
+to easily add it.
 
 Setup script finished.${reset}"
 echo ""
