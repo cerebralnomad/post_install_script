@@ -75,7 +75,6 @@ apps=(
         gpa # Graphical frontend for gnupg
         gparted # disk partition manager
         gtkhash # GUI checksum application
-        keepass2 # Local password vault
         mediainfo-gui # graphical frontend for mediainfo
         mp3splt-gtk # graphical frontend for mp3splt
         nomacs # Image viewer - requires 'Universe' repo to be enabled
@@ -103,6 +102,7 @@ flatpaks=(
         org.bunkus.mkvtoolnix-gui # create, modify and inspect MKV files
         com.calibre_ebook.calibre # ebook reader
         com.sigil_ebook.Sigil # ebook editor
+        org.keepassxc.KeePassXC # Keepass2 local password manager replacement
         org.torproject.torbrowser-launcher
 )
 
