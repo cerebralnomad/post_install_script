@@ -91,17 +91,18 @@ apps=(
 #	)
 
 # Flatpaks
+# Comment out or remove any you don't want
 
 flatpaks=(
         com.discordapp.Discord
-        org.flatpak.Builder
-        fr.handbrake.ghb
-        com.cerebralnomad.recipescribe
+        org.flatpak.Builder # Only needed if you create flatpaks
+        fr.handbrake.ghb # GUI video converter
+        com.cerebralnomad.recipescribe # My recipe program
         org.gnome.Sudoku
         org.qbittorrent.qBittorrent
-        org.bunkus.mkvtoolnix-gui
-        com.calibre_ebook.calibre
-        com.sigil_ebook.Sigil
+        org.bunkus.mkvtoolnix-gui # create, modify and inspect MKV files
+        com.calibre_ebook.calibre # ebook reader
+        com.sigil_ebook.Sigil # ebook editor
         org.torproject.torbrowser-launcher
 )
 
@@ -180,11 +181,13 @@ echo -e "${lightgreen}============================${reset}"
 echo ""
 
 # Remove the Firefox snap and setup the Mozilla PPA to install the .deb version (thank you Mozilla) because the snap sucks 
+echo -e "${lightgreen}Removing the Firefox snap${reset}"
+echo ""
 snap remove firefox
 install -d -m 0755 /etc/apt/keyrings  # Create an APT keyring (if one doesn’t already exist)
 # Import the Mozilla APT repo signing key
 wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/post_install_testing.sh# Add the Mozilla signing key to your sources.list
+# Add the Mozilla signing key to your sources.list
 echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
 # Set the Firefox package priority to ensure Mozilla’s Deb version is always preferred
 echo '
@@ -251,6 +254,7 @@ sudo -H -u $USERNAME sh -c "$(curl -fsSL https://raw.githubusercontent.com/robby
 sleep 1
 # Pull zsh theme from github and install 
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/clay.zsh-theme -O /home/$USERNAME/.oh-my-zsh/themes/clay.zsh-theme
+chown $USERNAME:$USERNAME /home/$USERNAME/.oh-my-zsh/themes/clay.zsh-theme
 sleep 1
 
 echo -e "${green}Additional sources added${reset}"
@@ -261,6 +265,7 @@ echo -e "${lightgreen}=======================${reset}"
 echo ""
 # Install of firefox will occasionally fail if -y is used without --allow-downgrades
 # so it is installed separately
+echo -e "${lightgreen}Installing Firefox from Mozilla repo${reset}"
 if apt install -y --allow-downgrades firefox ; then
         echo ""
         echo -e "${green}Firefox installed...${reset}"
@@ -276,6 +281,7 @@ fi
 
 
 for app in "${apps[@]}" ; do
+    echo -e "${lightgreen}Installing $app ...${reset}"
 	if apt install -y $app ; then
         echo "" 
 		echo -e "${green}$app installed...${reset}"
@@ -331,6 +337,7 @@ echo -e "${lightgreen}============================================${reset}"
 echo ""
 
 for pkg in "${addons[@]}" ; do
+        echo -e "${lightgreen}Installing $pkg ...${reset}"
         if apt install -y $pkg ; then
                 echo ""
                 echo -e "${green}$pkg installed...${reset}"
@@ -358,7 +365,16 @@ sudo -u $USERNAME mkdir /home/$USERNAME/bin
 rm /home/$USERNAME/.zshrc
 # Fetch modified .zshrc from GitHub
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.zshrc -O /home/$USERNAME/.zshrc
+chmod $USERNAME:$USERNAME .zshrc
 source /home/$USERNAME/.zshrc
+
+# Add terminator config file
+sudo -u $USERNAME mkdir /home/$USERNAME/.config/terminator
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/terminator_config -O /home/$USERNAME/.config/terminator/config
+chmod $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
+
+# Create blank aliases file because .zshrc expects one to exist
+sudo -u $USERNAME touch /home/$USERNAME/aliases
 
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
@@ -403,7 +419,8 @@ git config --global user.email me@example.com
 
 Log out and back in or reboot to activate the ZSH shell.
 Replace the ~/.zshrc with your custom backup.
-Add your aliases file to the bin directory and symlink in the home directory.
+Add your custom aliases file to the home directory if using.
+A blank one has been created as a placeholder as my .zshrc expects it to exist.
 
 If Firefox was not added to the program menu, run alacarte from the command line
 to easily add it.
@@ -412,7 +429,7 @@ Setup script finished.${reset}"
 echo ""
 echo -e "${pink}System must reboot for all changes to take effect${reset}"
 echo ""
-echo -e "${warn}System will reboot in 10 seconds...${reset}"
+echo -e "${warn}System will reboot in 30 seconds...${reset}"
 echo ""
-sleep 10
+sleep 30
 reboot
