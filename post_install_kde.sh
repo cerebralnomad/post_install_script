@@ -14,6 +14,17 @@ fi
 
 clear
 
+# Set variables for colorizing the terminal output
+red='\033[0;31m'
+green='\033[0;32m'
+lightgreen='\033[1;32m'
+reset='\033[0m'
+pink='\033[1;31m'
+lightred='\033[1;31m'
+yellow='\033[1;33m'
+lightpurple='\033[1;35m'
+warn=$(tput setaf 214)
+
 # Create the log file for any errors
 
 USERNAME="$SUDO_USER"
@@ -41,21 +52,21 @@ packages=(
 	zsh
 	)
 
-# GUI applications 
+# GUI applications
+# Currently (May 2024) the AppImage Launcher PPA does not have a release for Ubuntu 24.04
+# This will be uncommented once it is available
 
 apps=(
-        appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
+#        appimagelauncher # integrate AppImages into the system menu - from 3rd party PPA
         bleachbit # System cleaner
         brave-browser
         exiftool  # tool for displaying metadata of epub and other formats
-        firefox
         gimp
         gnupg2 # PGP handling
         gnubg  # Backgammon game
         gpa # Graphical frontend for gnupg
         gparted # I just prefer it over KDE Partition Manager
         gtkhash # GUI checksum application
-        keepass2 # Local password vault
         latte-dock # app dock for KDE
         mediainfo-gui # graphical frontend for mediainfo
         mp3splt-gtk # graphical frontend for mp3splt
@@ -75,21 +86,26 @@ apps=(
 
 flatpaks=(
         com.discordapp.Discord
-        org.flatpak.Builder
-        fr.handbrake.ghb
-        com.cerebralnomad.recipescribe
+        org.flatpak.Builder # Only needed if you create flatpaks 
+        fr.handbrake.ghb # GUI video converter
+        com.cerebralnomad.recipescribe # My recipe program
         org.gnome.Sudoku
         org.qbittorrent.qBittorrent
-        org.bunkus.mkvtoolnix-gui
-        com.calibre_ebook.calibre
-        com.sigil_ebook.Sigil
-        org.kde.filelight
-        org.kde.kdenlive
+        org.bunkus.mkvtoolnix-gui # create, modify and inspect MKV files
+        com.calibre_ebook.calibre # eboook reader
+        com.sigil_ebook.Sigil # ebook editor
+        org.kde.filelight # shows disk usage in visual charts
+        org.kde.kdenlive # video editor
+        org.keepassxc.KeePassXC # Keepass2 local password manager replacement
         org.torproject.torbrowser-launcher
 )
 
 #Terminal addons
-	
+
+# The offensive fortunes (fortunes-off) package is missing from the 24.04 repo
+ # The whining pansies may have gotten it removed
+ # Will uncomment if someone of substance decides to put it back
+
 addons=(
 	    bat  # a cat clone with syntax highlighting
         btop  # Resource monitor, like htop but better
@@ -103,7 +119,7 @@ addons=(
         ffmpeg  # command line video converter
         figlet # create ASCII art from plain text
         fortune-mod # display fortunes in the terminal
-        fortunes-off # adds offensive fortunes (fortune -o)
+#        fortunes-off # adds offensive fortunes (fortune -o)
         gcp  # advanced command-line file copier
         hollywood # silly program to make the terminal look like 1337 H4X0R
         hwinfo # display details abou tsystem hardware
@@ -127,27 +143,42 @@ addons=(
         yakuake # drop down terminal
 	)
 
-echo "Additional Program Installation for a Fresh OS Install"
-echo "======================================================"
+echo -e "${lightgreen}Updating Repos and Upgrading System Files${reset}"
+echo -e "${lightgreen}=========================================${reset}"
+add-apt-repository universe -y
+add-apt-repository restricted -y
+apt update && apt dist-upgrade -y
+apt install -y software-properties-common
+sleep 2
+
+# Install the packages first as wget and curl are needed in the next steps
+
+for pkg in "${packages[@]}" ; do
+    if apt install -y $pkg ; then
+            echo ""
+            echo -e "${green}$pkg successfully installed...${reset}"
+            echo ""
+            sleep 1
+        
+    else
+            echo ""
+            echo -e "${red}$pkg install FAILED!${reset}"
+            echo "$pkg failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+            echo ""
+            sleep 1
+    fi
+done
+
+echo -e "${lightgreen}Additional Program Installation for a Fresh OS Install${reset}"
+echo -e "${lightgreen}======================================================${reset}"
 echo ""
-echo "Adding Required Repositories"
-echo "============================"
+echo -e "${lightgreen}Adding Required Repositories${reset}"
+echo -e "${lightgreen}============================${reset}"
 echo ""
 
-# Add the AppImage Launcher repo
-add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nAppImage Launcher repo added...\n\n'
-sleep 2
-
-# Add the backports ppa 
-add-apt-repository ppa:kubuntu-ppa/backports
-sleep 2
-
-# Syncthing repo
-curl -s https://syncthing.net/release-key.txt | apt-key add - 2>> /home/$USERNAME/Documents/post_install_error.log
-echo 'deb https://apt.syncthing.net/ syncthing stable' | tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log && printf '\nSyncthing repo installed\n\n'
-sleep 2
-
-# Remove the Firefox snap and setup the Mozilla PPA to install the .deb version (thank you Mozilla) because the snap sucks 
+# Remove the Firefox snap and setup the Mozilla PPA to install the .deb version (thank you Mozilla) because the snap sucks
+echo -e "${lightgreen}Removing the Firefox snap${reset}"
+echo ""
 snap remove firefox
 install -d -m 0755 /etc/apt/keyrings  # Create an APT keyring (if one doesn’t already exist)
 # Import the Mozilla APT repo signing key
@@ -161,91 +192,135 @@ Pin: origin packages.mozilla.org
 Pin-Priority: 1000
 ' | sudo tee /etc/apt/preferences.d/mozilla
 
+# Add the AppImage Launcher repo
+
+# Currently (May 2024) this repo does not have a release for Ubuntu 24.04
+# Uncomment once a release is available
+
+#add-apt-repository ppa:appimagelauncher-team/stable 2>> /home/$USERNAME/Documents/post_install_error.log
+#echo ""
+#echo -e "${green}AppImage Launcher repo added...${reset}"
+#sleep 2
+
+
+# Add the backports ppa 
+add-apt-repository ppa:kubuntu-ppa/backports
+sleep 2
+
+# Syncthing repo
+curl -L -o /etc/apt/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg  2>> /home/$USERNAME/Documents/post_install_error.log
+echo "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sources.list.d/syncthing.list 2>> /home/$USERNAME/Documents/post_install_error.log
+echo ""
+echo -e "${green}Syncthing repo installed${reset}"
+sleep 2
+
 # Add the Brave browser repo for the once or twice a year when a site doesn't work with Firefox
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
-echo "Finished addding repos..."
+# Add the fastfetch repo; it is not yet in the 24.04 main repo
+add-apt-repository ppa:zhangsongcui3371/fastfetch -y
+
+echo -e "${green}Finished addding repos...${reset}"
 echo ""
-echo "Updating Repos and Upgrading System Files"
-echo "========================================="
-apt update && apt dist-upgrade -y
-
+echo -e "${lightgreen}Updating Newly Added Repos${reset}"
+echo -e "${lightgreen}==========================${reset}"
+apt update
 sleep 2
-
-echo "Installing Additional Tools"
-echo "==========================="
 echo ""
-
-# Install the packages first as wget and curl are needed in the next steps
-
-for pkg in "${packages[@]}" ; do
-	if apt install -y $pkg ; then 
-		printf "\n$pkg installed... \n\n"
-        sleep 1 
-	else 
-		printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
-        sleep 1
-	fi
-done
+echo -e "${lightgreen}Installing Additional Tools${reset}"
+echo -e "${lightgreen}===========================${reset}"
 echo ""
-sleep 2
 
 # Install Flatpak because Canonical is being a dick about it
 
-echo "Installing Flatpak"
-echo "=================="
+echo -e "${lightgreen}Installing Flatpak${reset}"
+echo -e "${lightgreen}==================${reset}"
 echo ""
-sudo apt install flatpak
+sudo apt install flatpak -y
 sleep 1
 echo ""
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 echo ""
+echo -e "${green}Flatpak installed...${reset}"
+echo ""
 sleep 2
 
-echo "Adding Additional Sources with wget and curl"
-echo "============================================"
+echo -e "${lightgreen}Adding Additional Sources with wget and curl${reset}"
+echo -e "${lightgreen}============================================${reset}"
 echo ""
 # Install Oh-My-ZSH
 sudo -H -u $USERNAME sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" "" --unattended
 sleep 1
 # Pull zsh theme from github and install 
-wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/clay.zsh-theme -O ~/.oh-my-zsh/themes/clay.zsh-theme
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/clay.zsh-theme -O /home/$USERNAME/.oh-my-zsh/themes/clay.zsh-theme
+chown $USERNAME:$USERNAME /home/$USERNAME/.oh-my-zsh/themes/clay.zsh-theme
 sleep 1
 
-echo "Additional sources added"
+echo -e "${green}Additional sources added${reset}"
 echo ""
 sleep 2
-echo "Installing Applications"
-echo "======================="
+echo -e "${lightgreen}Installing Applications${reset}"
+echo -e "${lightgreen}=======================${reset}"
 echo ""
+
+# Install of firefox will occasionally fail if -y is used without --allow-downgrades
+# so it is installed separately
+echo -e "${lightgreen}Installing Firefox from Mozilla repo${reset}"
+echo ""
+if apt install -y --allow-downgrades firefox ; then
+        echo ""
+        echo -e "${green}Firefox installed...${reset}"
+        echo ""
+        sleep 1
+else
+        echo""
+        echo -e "${red}Firefox install FAILED!${reset}"
+        echo "Firefox to install from the Mozilla repo" >> /home/$USERNAME/Documents/post_install_error.log
+        echo ""
+        sleep 1
+fi
+
 for app in "${apps[@]}" ; do
-	if apt install -y $app ; then 
-		printf "\n$app installed... \n\n"
+    echo -e "${lightgreen}Installing $app ...${reset}"
+    echo ""
+	if apt install -y $app ; then
+        echo "" 
+		echo -e "${green}$app installed...${reset}"
+        echo ""
         sleep 1
 	else 
-		printf "\n$app install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
+		echo ""
+        echo -e "${red}$app install FAILED!${reset}"
+        echo "$app failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+        echo ""
         sleep 1
 	fi
 done
 echo ""
 sleep 1
 
-echo "Installing Flatpaks"
-echo "==================="
+echo -e "${lightgreen}Installing Flatpaks${reset}"
+echo -e "${lightgreen}===================${reset}"
 echo ""
 for app in "${flatpaks[@]}" ; do
-        if flatpak install flathub $app ; then
-                printf "\n$app installed... \n\n"
+        if flatpak install -y flathub $app ; then
+                echo ""
+                echo -e "${green}$app Flatpak installed...${reset}"
+                echo ""
                 sleep 1
         else
-                printf "\n$app install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
+                echo ""
+                echo -e "${red}$app install FAILED!${reset}"
+                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
                 sleep 1
         fi
 done
 
 # Install yt-dlp, a better youtube-dl replacement
-
+echo ""
+echo -e "${lightgreen}Installing yt-dlp${reset}"
+echo ""
 curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
 chmod a+rx /usr/local/bin/yt-dlp
 
@@ -255,45 +330,99 @@ chmod a+rx /usr/local/bin/yt-dlp
 echo "# Always choose the best available quality" > /etc/yt-dlp.conf
 echo '-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"' >> /etc/yt-dlp.conf
 
-echo "yt-dlp installed"
+echo -e "${green}yt-dlp installed...${reset}"
 echo ""
 sleep 1
 
-echo "Installing Terminal Addons for Fresh Install"
-echo "============================================"
+echo -e "${lightgreen}Installing Terminal Addons for Fresh Install${reset}"
+echo -e "${lightgreen}============================================${reset}"
 echo ""
 
 for pkg in "${addons[@]}" ; do
+        echo -e "${lightgreen}Installing $pkg ...${reset}"
+        echo ""
         if apt install -y $pkg ; then
-                printf "\n$pkg installed... \n\n"
+                echo ""
+                echo -e "${green}$pkg installed...${reset}"
+                echo ""
                 sleep 1
         else
-                printf "\n$pkg install FAILED! \n\n" 2>> /home/$USERNAME/Documents/post_install_error.log
+                echo ""
+                echo -e "${red}$pkg install FAILED!${reset}"
+                echo "$pkg failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+                echo ""
                 sleep 1
         fi
 done
 
+# Install the syntax highlighting plugin for ZSH
+sudo -u $USERNAME mkdir /home/$USERNAME/.zsh_scripts
+cd /home/$USERNAME/.zsh_scripts
+sudo -u $USERNAME git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+cd /home/$USERNAME
+
+# Make local directories to be added to PATH
+sudo -u $USERNAME mkdir /home/$USERNAME/.local/bin
+sudo -u $USERNAME mkdir /home/$USERNAME/bin
+# Remove existing .zshrc
+rm /home/$USERNAME/.zshrc
+# Fetch modified .zshrc from GitHub
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.zshrc -O /home/$USERNAME/.zshrc
+chown $USERNAME:$USERNAME .zshrc
+
+# Add terminator config file
+sudo -u $USERNAME mkdir /home/$USERNAME/.config/terminator
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/terminator_config -O /home/$USERNAME/.config/terminator/config
+chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
+
+# Create blank aliases file because .zshrc expects one to exist
+sudo -u $USERNAME touch /home/$USERNAME/aliases
+
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
-ln -s /usr/bin/batcat ~/.local/bin/bat
+sudo -u $USERNAME ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
 
 # Install the TL/DR utility
-npm install -g tldr && printf "\nTLDR installed... \n\n"
+if npm install -g tldr ; then
+        echo ""
+        echo -e "${green}TL/DR installed...${reset}"
+        echo ""
+else
+        echo ""
+        echo -e "${red}TL/DR install FAILED!${reset}"
+        echo "TLDR failed to install with npm" >> /home/$USERNAME/Documents/post_install_error.log
+        echo ""
+fi
+
 sleep 1
 
-# Change the default shell from bash to zsh
-chsh -s /usr/bin/zsh
+# Install broot
+curl -o broot -L https://dystroy.org/broot/download/x86_64-linux/broot
+mv broot /usr/local/bin
+chmod +x /usr/local/bin/broot
 
+echo -e "${pink}Now we'll change the default shell to ZSH. The password for $USERNAME will be required${reset}"
 echo ""
-echo "Terminal Addons and all applications installed... 
+# Change the default shell from bash to zsh
+sudo -u $USERNAME chsh -s /usr/bin/zsh
+echo ""
+# Configure broot
+echo -e "${pink}Now we'll configure broot. You will be prompted to let it install the shell function, select Yes${reset}"
+echo ""
+sudo -u $USERNAME broot
+echo ""
+echo -e "${pink}Now you can use br to run broot${reset}"
+echo ""
+echo -e "${green}Terminal Addons and all applications installed... 
 Remember to configure Git without using sudo privileges after this script has exited.
 
 git config --global user.name <username>
 git config --global user.email me@example.com
 
-Log out and back in or reboot to activate the ZSH shell.
 Replace the ~/.zshrc with your custom backup.
-Add your aliases file to the bin directory and symlink in the home directory.
+Add your custom aliases file to the home directory if using.
+A blank one has been created as a placeholder as my .zshrc expects it to exist.
 
-Setup script finished."
-
+Setup script finished.${reset}"
+echo ""
+echo -e "${pink}System must reboot for all changes to take effect${reset}"
