@@ -225,7 +225,6 @@ echo ""
 echo -e "${lightgreen}Updating Newly Added Repos${reset}"
 echo -e "${lightgreen}==========================${reset}"
 apt update
-bash add to path
 sleep 2
 echo ""
 echo -e "${lightgreen}Installing Additional Tools${reset}"
@@ -266,6 +265,7 @@ echo ""
 # Install of firefox will occasionally fail if -y is used without --allow-downgrades
 # so it is installed separately
 echo -e "${lightgreen}Installing Firefox from Mozilla repo${reset}"
+echo ""
 if apt install -y --allow-downgrades firefox ; then
         echo ""
         echo -e "${green}Firefox installed...${reset}"
@@ -282,6 +282,7 @@ fi
 
 for app in "${apps[@]}" ; do
     echo -e "${lightgreen}Installing $app ...${reset}"
+    echo ""
 	if apt install -y $app ; then
         echo "" 
 		echo -e "${green}$app installed...${reset}"
@@ -338,6 +339,7 @@ echo ""
 
 for pkg in "${addons[@]}" ; do
         echo -e "${lightgreen}Installing $pkg ...${reset}"
+        echo ""
         if apt install -y $pkg ; then
                 echo ""
                 echo -e "${green}$pkg installed...${reset}"
@@ -365,13 +367,12 @@ sudo -u $USERNAME mkdir /home/$USERNAME/bin
 rm /home/$USERNAME/.zshrc
 # Fetch modified .zshrc from GitHub
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.zshrc -O /home/$USERNAME/.zshrc
-chmod $USERNAME:$USERNAME .zshrc
-source /home/$USERNAME/.zshrc
+chown $USERNAME:$USERNAME .zshrc
 
 # Add terminator config file
 sudo -u $USERNAME mkdir /home/$USERNAME/.config/terminator
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/terminator_config -O /home/$USERNAME/.config/terminator/config
-chmod $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
+chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
 
 # Create blank aliases file because .zshrc expects one to exist
 sudo -u $USERNAME touch /home/$USERNAME/aliases
