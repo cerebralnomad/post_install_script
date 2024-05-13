@@ -114,6 +114,8 @@ fi
 
 if [[ $(wc -l < ~/Documents/reminder) -ge 4 ]]; then
     cat ~/Documents/reminder
+elif [[ ! -d /usr/share/games/fortunes/off ]]; then
+        fortune
 else
     fortune -o -n 380
 fi
@@ -125,4 +127,4 @@ fi
 
 source ~/.zsh_scripts/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 
-source /home/clay/.config/broot/launcher/bash/br
+source ~/.config/broot/launcher/bash/br
