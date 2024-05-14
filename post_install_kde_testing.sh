@@ -300,22 +300,22 @@ done
 echo ""
 sleep 1
 
-echo -e "${lightgreen}Installing Flatpaks${reset}"
-echo -e "${lightgreen}===================${reset}"
-echo ""
-for app in "${flatpaks[@]}" ; do
-        if flatpak install -y flathub $app ; then
-                echo ""
-                echo -e "${green}$app Flatpak installed...${reset}"
-                echo ""
-                sleep 1
-        else
-                echo ""
-                echo -e "${red}$app install FAILED!${reset}"
-                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
-                sleep 1
-        fi
-done
+#echo -e "${lightgreen}Installing Flatpaks${reset}"
+#echo -e "${lightgreen}===================${reset}"
+#echo ""
+#for app in "${flatpaks[@]}" ; do
+#        if flatpak install -y flathub $app ; then
+#                echo ""
+#                echo -e "${green}$app Flatpak installed...${reset}"
+#                echo ""
+#                sleep 1
+#        else
+#                echo ""
+#                echo -e "${red}$app install FAILED!${reset}"
+#                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+#                sleep 1
+#        fi
+#done
 
 # Install yt-dlp, a better youtube-dl replacement
 echo ""
@@ -377,6 +377,15 @@ chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
 
 # Create blank aliases file because .zshrc expects one to exist
 sudo -u $USERNAME touch /home/$USERNAME/aliases
+
+# Add vim customizations
+sudo -u $USERNAME mkdir /home/$USERNAME/.vim
+cd /home/$USERNAME/.vim
+git clone git@github.com:tomasr/molokai.git ~/.vim
+cd /home/$USERNAME
+chown -R $USERNAME:$USERNAME .vim
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.vimrc
+chown $USERNAME:$USERNAME .vimrc
 
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
