@@ -147,6 +147,9 @@ echo -e "${lightgreen}Updating Repos and Upgrading System Files${reset}"
 echo -e "${lightgreen}=========================================${reset}"
 add-apt-repository universe -y
 add-apt-repository restricted -y
+# Add the backports ppa 
+add-apt-repository ppa:kubuntu-ppa/backports -y
+sleep 2
 apt update && apt dist-upgrade -y
 apt install -y software-properties-common
 sleep 2
@@ -203,9 +206,6 @@ Pin-Priority: 1000
 #sleep 2
 
 
-# Add the backports ppa 
-add-apt-repository ppa:kubuntu-ppa/backports
-sleep 2
 
 # Syncthing repo
 curl -L -o /etc/apt/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg  2>> /home/$USERNAME/Documents/post_install_error.log
