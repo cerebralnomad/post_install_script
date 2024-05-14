@@ -147,6 +147,9 @@ echo -e "${lightgreen}Updating Repos and Upgrading System Files${reset}"
 echo -e "${lightgreen}=========================================${reset}"
 add-apt-repository universe -y
 add-apt-repository restricted -y
+# Add the backports ppa 
+add-apt-repository ppa:kubuntu-ppa/backports -y
+sleep 2
 apt update && apt dist-upgrade -y
 apt install -y software-properties-common
 sleep 2
@@ -203,9 +206,6 @@ Pin-Priority: 1000
 #sleep 2
 
 
-# Add the backports ppa 
-add-apt-repository ppa:kubuntu-ppa/backports
-sleep 2
 
 # Syncthing repo
 curl -L -o /etc/apt/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg  2>> /home/$USERNAME/Documents/post_install_error.log
@@ -378,6 +378,16 @@ chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
 # Create blank aliases file because .zshrc expects one to exist
 sudo -u $USERNAME touch /home/$USERNAME/aliases
 
+# Add vim customizations
+sudo -u $USERNAME mkdir -P /home/$USERNAME/.vim/colors
+cd /home/$USERNAME/.vim/colors
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/molokai.vim
+chown $USERNAME:$USERNAME molokai.vim
+cd /home/$USERNAME
+chown -R $USERNAME:$USERNAME .vim
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.vimrc
+chown $USERNAME:$USERNAME .vimrc
+
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
 sudo -u $USERNAME ln -s /usr/bin/batcat /home/$USERNAME/.local/bin/bat
@@ -426,3 +436,8 @@ A blank one has been created as a placeholder as my .zshrc expects it to exist.
 Setup script finished.${reset}"
 echo ""
 echo -e "${pink}System must reboot for all changes to take effect${reset}"
+echo ""
+echo -e "${warn}System will reboot in 30 seconds...${reset}"
+echo ""
+sleep 30
+reboot
