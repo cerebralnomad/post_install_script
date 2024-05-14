@@ -379,9 +379,10 @@ chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
 sudo -u $USERNAME touch /home/$USERNAME/aliases
 
 # Add vim customizations
-sudo -u $USERNAME mkdir /home/$USERNAME/.vim
-cd /home/$USERNAME/.vim
-git clone git@github.com:tomasr/molokai.git /home/$USERNAME/.vim
+sudo -u $USERNAME mkdir -P /home/$USERNAME/.vim/colors
+cd /home/$USERNAME/.vim/colors
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/molokai.vim
+chown $USERNAME:$USERNAME molokai.vim
 cd /home/$USERNAME
 chown -R $USERNAME:$USERNAME .vim
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.vimrc
