@@ -36,11 +36,6 @@ echo 'Error log created at:'
 echo "/home/$USERNAME/Documents/post_install_error.log"
 sleep 3
 
-# Increase the bash history size to allow scrolling back through the output
-export HISTSIZE=-1
-export HISTFILESIZE=-1
-source /home/$USERNAME/.bashrc
-
 # Create the variables for the various packages to be installed
 # Comment out any you do not want/need
 # Some of these will already be installed on some distros
@@ -376,6 +371,16 @@ chown $USERNAME:$USERNAME /home/$USERNAME/.config/terminator/config
 
 # Create blank aliases file because .zshrc expects one to exist
 sudo -u $USERNAME touch /home/$USERNAME/aliases
+
+# Add vim customizations
+sudo -u $USERNAME mkdir -P /home/$USERNAME/.vim/colors
+cd /home/$USERNAME/.vim/colors
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/molokai.vim
+chown $USERNAME:$USERNAME molokai.vim
+cd /home/$USERNAME
+chown -R $USERNAME:$USERNAME .vim
+wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.vimrc
+chown $USERNAME:$USERNAME .vimrc
 
 # Create symlink for bat in .local directory
 # bat installs as batcat on Ubuntu due to a name clash with another existing package
