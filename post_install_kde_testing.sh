@@ -300,22 +300,22 @@ done
 echo ""
 sleep 1
 
-#echo -e "${lightgreen}Installing Flatpaks${reset}"
-#echo -e "${lightgreen}===================${reset}"
-#echo ""
-#for app in "${flatpaks[@]}" ; do
-#        if flatpak install -y flathub $app ; then
-#                echo ""
-#                echo -e "${green}$app Flatpak installed...${reset}"
-#                echo ""
-#                sleep 1
-#        else
-#                echo ""
-#                echo -e "${red}$app install FAILED!${reset}"
-#                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
-#                sleep 1
-#        fi
-#done
+echo -e "${lightgreen}Installing Flatpaks${reset}"
+echo -e "${lightgreen}===================${reset}"
+echo ""
+for app in "${flatpaks[@]}" ; do
+        if flatpak install -y flathub $app ; then
+                echo ""
+                echo -e "${green}$app Flatpak installed...${reset}"
+                echo ""
+                sleep 1
+        else
+                echo ""
+                echo -e "${red}$app install FAILED!${reset}"
+                echo "$app Flatpak failed to install" >> /home/$USERNAME/Documents/post_install_error.log
+                sleep 1
+        fi
+done
 
 # Install yt-dlp, a better youtube-dl replacement
 echo ""
