@@ -381,7 +381,7 @@ sudo -u $USERNAME touch /home/$USERNAME/aliases
 # Add vim customizations
 sudo -u $USERNAME mkdir /home/$USERNAME/.vim
 cd /home/$USERNAME/.vim
-git clone git@github.com:tomasr/molokai.git ~/.vim
+git clone git@github.com:tomasr/molokai.git /home/$USERNAME/.vim
 cd /home/$USERNAME
 chown -R $USERNAME:$USERNAME .vim
 wget https://raw.githubusercontent.com/cerebralnomad/post_install_script/master/.vimrc
@@ -435,3 +435,8 @@ A blank one has been created as a placeholder as my .zshrc expects it to exist.
 Setup script finished.${reset}"
 echo ""
 echo -e "${pink}System must reboot for all changes to take effect${reset}"
+echo ""
+echo -e "${warn}System will reboot in 30 seconds...${reset}"
+echo ""
+sleep 30
+reboot
